@@ -4,7 +4,9 @@ This is a **Singularity container** for running the **CLVisc framework**, precon
 
 - **Pythia 8.303** – compatible with **SMASH 2.2**
 - **Pythia 8.309** – compatible with **SMASH 3.0**
-- **OpenCL**, **Python 3.11**, **PyOpenCL**, **Boost**, **GSL**, **HDF5**, **Eigen 3.4.0**, **GCC 9**, and other development tools.
+- **OpenCL** (host-provided), **Python 3.11**, **PyOpenCL 2025.01**, **NumPy 1.24.3**, **h5py**, **SciPy**, **Pandas**, **Matplotlib**,  
+  **Boost 1.71.0**, **GSL**, **HDF5 (via libhdf5-dev)**, **Eigen 3.4.0**, **GCC/G++ 9**, and other development tools (e.g., CMake 3.16, Git, Vim).
+
 
 ---
 It is easy to use:
@@ -17,8 +19,11 @@ apptainer remote add --no-login SylabsCloud cloud.sycloud.io
 singularity pull --arch amd64 library://xiangyuwu/hydro/clviscdev:stable
 ```
 
-### 2. Run the container with NVIDIA GPU support and bind the host CUDA and OpenCL configuration:
+### 2. Run the Container
 
+Run the container with NVIDIA GPU support and bind the host CUDA and OpenCL configuration:
+
+---
 ```bash
 singularity shell --nv \
   --bind /path/to/your/cuda:/usr/local/cuda \
@@ -27,4 +32,4 @@ singularity shell --nv \
 ```
 
 **Replace** `/path/to/your/cuda` with the actual path to your CUDA installation  
-> (for example: `/usr/local/cuda-11.4`)
+(for example: `/usr/local/cuda-11.4`)
