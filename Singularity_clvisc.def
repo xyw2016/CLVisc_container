@@ -6,7 +6,7 @@ From: ubuntu:20.04
     Version 1.0
 
 %post
-    # Set noninteractive mode to avoid interactive prompts 
+    # Set noninteractive mode to avoid interactive prompts (e.g., tzdata)
     export DEBIAN_FRONTEND=noninteractive
 
     # Update system and install basic packages including vim and HDF5 development libraries and tools
@@ -36,6 +36,8 @@ From: ubuntu:20.04
     apt-get update
     apt-get install -y python3.11 python3.11-dev python3.11-venv libffi-dev
 
+    ln -sf /usr/bin/python3.11 /usr/bin/python
+
     # Install pip for Python 3.11 using ensurepip and upgrade pip
     python3.11 -m ensurepip --upgrade
     ln -sf /usr/bin/python3.11 /usr/local/bin/python3
@@ -47,6 +49,8 @@ From: ubuntu:20.04
     python3 -m pip install numpy==1.24.3 h5py scipy
     python3 -m pip install pandas
     python3 -m pip install matplotlib 
+    python3 -m pip install tqdm 
+
 
     # Install gcc-9 from ubuntu-toolchain PPA
     add-apt-repository ppa:ubuntu-toolchain-r/test -y
