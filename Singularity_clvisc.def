@@ -1,0 +1,105 @@
+Bootstrap: docker
+From: ubuntu:20.04
+
+%labels
+    Author Xiang-Yu Wu 
+    Version 1.0
+
+%post
+    # Set noninteractive mode to avoid interactive prompts 
+    export DEBIAN_FRONTEND=noninteractive
+
+    # Update system and install basic packages including vim and HDF5 development libraries and tools
+    apt-get update && apt-get install -y \
+        build-essential \
+        wget \
+        curl \
+        git \
+        vim \
+        software-properties-common \
+        libhdf5-dev \
+        libssl-dev \
+        hdf5-tools
+    apt-get install -y mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev
+
+    # Compile and install CMake 3.10.3 from source
+    cd /opt
+    wget https://cmake.org/files/v3.16/cmake-3.16.9.tar.gz
+    tar -xzf cmake-3.16.9.tar.gz
+    cd cmake-3.16.9
+    ./bootstrap && make -j$(nproc) && make install
+    cd /
+
+
+    # Add deadsnakes PPA and install Python 3.11 along with required dependencies
+    add-apt-repository ppa:deadsnakes/ppa -y
+    apt-get update
+    apt-get install -y python3.11 python3.11-dev python3.11-venv libffi-dev
+
+    # Install pip for Python 3.11 using ensurepip and upgrade pip
+    python3.11 -m ensurepip --upgrade
+    ln -sf /usr/bin/python3.11 /usr/local/bin/python3
+    python3 -m pip install --upgrade pip
+
+    # Install required Python packages using python3 -m pip
+    python3 -m pip install pybind11
+    python3 -m pip install pyopencl==2025.01
+    python3 -m pip install numpy==1.24.3 h5py scipy
+    python3 -m pip install pandas
+    python3 -m pip install matplotlib 
+
+    # Install gcc-9 from ubuntu-toolchain PPA
+    add-apt-repository ppa:ubuntu-toolchain-r/test -y
+    apt-get update
+    apt-get install -y gcc-9 g++-9
+
+    # Set gcc-9 as the default compiler (optional)
+    update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 100
+    update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 100
+
+    # Install Boost using apt-get (this installs Boost 1.71.0 on Ubuntu 20.04)
+    apt-get install -y libboost-all-dev
+
+    # Install GSL using apt-get
+    apt-get install -y libgsl-dev
+
+    # ---  Eigen 3.4.0 ---
+    cd /opt
+    wget https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.tar.gz
+    tar -xzf eigen-3.4.0.tar.gz
+    cd eigen-3.4.0
+    mkdir build && cd build
+    cmake .. && make install
+    cd /
+
+    # ---  Pythia 8.309 ---
+    cd /opt
+    wget https://pythia.org/download/pythia83/pythia8309.tgz
+    tar xf pythia8309.tgz && rm pythia8309.tgz
+    cd pythia8309
+    ./configure --cxx-common='-std=c++17 -march=native -O3 -fPIC -pthread'
+    make -j$(nproc)
+
+    cd /opt
+    wget https://pythia.org/download/pythia83/pythia8307.tgz
+    tar xf pythia8307.tgz && rm pythia8307.tgz
+    cd pythia8307
+    ./configure --cxx-common='-std=c++11 -march=native -O3 -fPIC'
+    make -j$(nproc)
+
+    # Clean up caches and remove downloaded source archives
+    apt-get clean && rm -rf /var/lib/apt/lists/* \
+         /opt/cmake-3.16.9.tar.gz \
+         /opt/eigen-3.4.0.tar.gz
+
+    
+%environment
+    # Set necessary environment variables
+    export PATH=/usr/local/bin:$PATH
+    export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+    export PATH=/opt/cmake-3.16/bin:$PATH
+
+%runscript
+    echo "This Singularity container relies on the host's CUDA environment (use --nv) and includes CMake 3.16, Python 3.11, pyopencl 2025.01, pybind11, numpy==1.24.3, h5py, scipy, gcc-9, Boost (1.71.0 via apt-get), GSL (via apt-get), HDF5 (via apt-get), and vim."
+    exec "$@"
+
