@@ -28,7 +28,7 @@ Run the container with NVIDIA GPU support and bind the host CUDA and OpenCL conf
 singularity shell --nv \
   --bind /path/to/your/cuda:/usr/local/cuda \
   --bind /etc/OpenCL/vendors:/etc/OpenCL/vendors \
-  ./clviscdev_latest.sif
+  ./clviscdev_stable.sif
 ```
 
 **Replace** `/path/to/your/cuda` with the actual path to your CUDA installation  

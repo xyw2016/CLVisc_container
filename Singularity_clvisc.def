@@ -55,11 +55,13 @@ From: ubuntu:20.04
     # Install gcc-9 from ubuntu-toolchain PPA
     add-apt-repository ppa:ubuntu-toolchain-r/test -y
     apt-get update
-    apt-get install -y gcc-9 g++-9
+    apt-get install -y gcc-9 g++-9 gfortran-9
 
     # Set gcc-9 as the default compiler (optional)
     update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 100
     update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 100
+    update-alternatives --install /usr/bin/gfortran gfortran /usr/bin/gfortran-9 100
+
 
     # Install Boost using apt-get (this installs Boost 1.71.0 on Ubuntu 20.04)
     apt-get install -y libboost-all-dev
